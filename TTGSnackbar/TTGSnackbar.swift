@@ -131,9 +131,9 @@ public class TTGSnackbar: UIView {
     /// Height: [44, +]. Default is 44
     public var height: CGFloat = 44 {
         didSet {
-            if height < 44 {
-                height = 44
-            }
+//            if height < 44 {
+//                height = 44
+//            }
             heightConstraint?.constant = height
             self.layoutIfNeeded()
         }
