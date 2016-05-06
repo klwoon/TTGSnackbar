@@ -362,7 +362,7 @@ public class TTGSnackbar: UIView {
         // On main thread
         dispatch_async(dispatch_get_main_queue()) {
             () -> Void in
-            self.dismissAnimated(true)
+            self.dismissAnimated(false)
         }
     }
 
@@ -499,13 +499,13 @@ public class TTGSnackbar: UIView {
         invalidDismissTimer()
         activityIndicatorView.stopAnimating()
 
-        let superViewWidth = CGRectGetWidth((superview?.frame)!)
-
         if !animated {
             dismissBlock?(snackbar: self)
             self.removeFromSuperview()
             return
         }
+
+        let superViewWidth = CGRectGetWidth((superview?.frame)!)
 
         var animationBlock: (() -> Void)? = nil
 
