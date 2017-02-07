@@ -1,6 +1,11 @@
-platform :ios, '8.0'
 use_frameworks!
 
-target 'TTGSnackbarExample' do
-    pod "TTGSnackbar", :path => "../"
+target 'TTGSnackbar_Example' do
+  pod 'TTGSnackbar', :path => '../'
+
+  target 'TTGSnackbar_Tests' do
+    inherit! :search_paths
+
+    
+  end
 end
