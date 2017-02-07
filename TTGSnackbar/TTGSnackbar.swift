@@ -57,7 +57,7 @@ open class TTGSnackbar: UIView {
     fileprivate static let snackbarDefaultFrame: CGRect = CGRect(x: 0, y: 0, width: 320, height: 44)
     
     /// Snackbar min height
-    fileprivate static let snackbarMinHeight: CGFloat = 44
+    fileprivate static let snackbarMinHeight: CGFloat = 1
     
     /// Snackbar icon imageView default width
     fileprivate static let snackbarIconImageViewWidth: CGFloat = 32
