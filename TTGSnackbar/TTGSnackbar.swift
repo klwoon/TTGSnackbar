@@ -644,10 +644,7 @@ public extension TTGSnackbar {
         invalidDismissTimer()
         activityIndicatorView.stopAnimating()
 
-        guard let superview = superview else {
-            return
-        }
-        let superViewWidth = superview.frame.width
+        let superViewWidth = (superview?.frame)!.width
         let snackbarHeight = frame.size.height
 
         if !animated {
