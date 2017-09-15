@@ -74,8 +74,23 @@ open class TTGSnackbar: UIView {
 
     /// Dismiss callback closure definition.
     public typealias TTGDismissBlock = (_ snackbar:TTGSnackbar) -> Void
+ 
+    /// Swipe gesture callback closure
+    public typealias TTGSwipeBlock = (_ snackbar: TTGSnackbar, _ direction: UISwipeGestureRecognizerDirection) -> Void
 
     // MARK: - Public property.
+ 
+    /// Tap callback
+    open dynamic var onTapBlock: TTGActionBlock?
+    
+    /// Swipe callback
+    open dynamic var onSwipeBlock: TTGSwipeBlock?
+ 
+    /// A property to make the snackbar auto dismiss on Swipe Gesture
+    open dynamic var shouldDismissOnSwipe: Bool = false
+ 
+    /// a property to enable left and right margin when using customContentView
+    open dynamic var shouldActivateLeftAndRightMarginOnCustomContentView: Bool = false
 
     /// Action callback.
     open dynamic var actionBlock: TTGActionBlock? = nil
@@ -364,6 +379,21 @@ open class TTGSnackbar: UIView {
         configure()
     }
 
+     /**
+     Show a customContentView like a Toast
+     
+     - parameter customContentView: Custom View to be shown.
+     - parameter duration: Duration type.
+     
+     - returns: TTGSnackbar instance
+     */
+    public init(customContentView: UIView, duration: TTGSnackbarDuration) {
+        super.init(frame: TTGSnackbar.snackbarDefaultFrame)
+        self.duration = duration
+        self.customContentView = customContentView
+        configure()
+    }
+
     /**
      Show a message with action button.
      
@@ -464,7 +494,7 @@ public extension TTGSnackbar {
         addConstraints([contentViewTopConstraint!, contentViewBottomConstraint!, contentViewLeftConstraint!, contentViewRightConstraint!])
 
         // Get super view to show
-        if let superView = containerView ?? UIApplication.shared.keyWindow {
+        if let superView = containerView ?? UIApplication.shared.delegate?.window ?? UIApplication.shared.keyWindow {
             superView.addSubview(self)
             
             // Left margin constraint
@@ -515,8 +545,8 @@ public extension TTGSnackbar {
 
             // Active or deactive
             topMarginConstraint?.isActive = false // For top animation
-            leftMarginConstraint?.isActive = customContentView == nil
-            rightMarginConstraint?.isActive = customContentView == nil
+            leftMarginConstraint?.isActive = self.shouldActivateLeftAndRightMarginOnCustomContentView ? true : customContentView == nil
+            rightMarginConstraint?.isActive = self.shouldActivateLeftAndRightMarginOnCustomContentView ? true : customContentView == nil
             centerXConstraint?.isActive = customContentView != nil
             
             // Show
@@ -848,6 +878,19 @@ private extension TTGSnackbar {
         actionButton.setContentCompressionResistancePriority(999, for: .horizontal)
         secondActionButton.setContentHuggingPriority(998, for: .horizontal)
         secondActionButton.setContentCompressionResistancePriority(999, for: .horizontal)
+     
+        // add gesture recognizers
+        // tap gesture
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.didTapSelf)))
+        
+        self.isUserInteractionEnabled = true
+        
+        // swipe gestures
+        [UISwipeGestureRecognizerDirection.up, .down, .left, .right].forEach { (direction) in
+            let gesture = UISwipeGestureRecognizer(target: self, action: #selector(self.didSwipeSelf(_:)))
+            gesture.direction = direction
+            self.addGestureRecognizer(gesture)
+        }
     }
 }
 
@@ -873,6 +916,34 @@ private extension TTGSnackbar {
             activityIndicatorView.startAnimating()
         } else {
             dismissAnimated(true)
+        }
+    }
+ 
+     /// tap callback
+    @objc func didTapSelf() {
+        self.onTapBlock?(self)
+    }
+    
+    /**
+     Action button callback
+     
+     - parameter gesture: the gesture that is sent to the user
+     */
+
+    @objc func didSwipeSelf(_ gesture: UISwipeGestureRecognizer) {
+        self.onSwipeBlock?(self, gesture.direction)
+     
+        if self.shouldDismissOnSwipe {
+            if gesture.direction == .right {
+                self.animationType = .slideFromLeftToRight
+            } else if gesture.direction == .left {
+                self.animationType = .slideFromRightToLeft
+            } else if gesture.direction == .up {
+                self.animationType = .slideFromTopBackToTop
+            } else if gesture.direction == .down {
+                self.animationType = .slideFromTopBackToTop
+            }
+            self.dismiss()
         }
     }
 }
