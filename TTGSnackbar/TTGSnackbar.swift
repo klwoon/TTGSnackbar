@@ -58,7 +58,7 @@ open class TTGSnackbar: UIView {
     /// Snackbar min height
     fileprivate static var snackbarMinHeight: CGFloat = 44
 
-    open dynamic var height: CGFloat = snackbarMinHeight {
+    @objc open dynamic var height: CGFloat = snackbarMinHeight {
         didSet {
             TTGSnackbar.snackbarMinHeight = height
         }
